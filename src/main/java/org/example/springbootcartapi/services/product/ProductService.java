@@ -1,7 +1,7 @@
 package org.example.springbootcartapi.services.product;
 
 import lombok.RequiredArgsConstructor;
-import org.example.springbootcartapi.exceptions.ProductNotFoundException;
+import org.example.springbootcartapi.exceptions.ResourceNotFoundException;
 import org.example.springbootcartapi.model.Category;
 import org.example.springbootcartapi.model.Product;
 import org.example.springbootcartapi.repository.CategoryRepository;
@@ -38,12 +38,12 @@ public class ProductService implements IProductService {
 
     @Override
     public Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException("Product not found"));
+        return productRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Product not found"));
     }
 
     @Override
     public void deleteProductById(Long id) {
-        productRepository.findById(id).ifPresentOrElse(productRepository::delete, ()->{ throw new ProductNotFoundException("Product not found");});
+        productRepository.findById(id).ifPresentOrElse(productRepository::delete, ()->{ throw new ResourceNotFoundException("Product not found");});
     }
 
     @Override
@@ -51,17 +51,15 @@ public class ProductService implements IProductService {
         return productRepository.findById(productId)
                 .map(existingProduct -> updateExistingProduct(existingProduct, request))
                 .map(productRepository::save)
-                .orElseThrow(()-> new ProductNotFoundException("Product not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Product not found"));
     }
 
     private Product updateExistingProduct(Product product, UpdateProductRequest request) {
-
         product.setName(request.getName());
         product.setBrand(request.getBrand());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setDescription(request.getDescription());
-
         Category category = categoryRepository.findByName(request.getCategory().getName());
         product.setCategory(category);
         return product;

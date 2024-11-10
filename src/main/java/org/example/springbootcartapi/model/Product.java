@@ -7,19 +7,18 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private int quantity;
     private String name;
     private String brand;
-    private String description;
     private BigDecimal price;
     private int stock;
-    private int quantity;
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -27,4 +26,13 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images;
+
+    public Product(String name, String brand, BigDecimal price, int stock, String description, Category category) {
+        this.name = name;
+        this.brand = brand;
+        this.price = price;
+        this.stock = stock;
+        this.description = description;
+        this.category = category;
+    }
 }

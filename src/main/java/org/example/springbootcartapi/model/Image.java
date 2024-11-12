@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Blob;
+
 
 @Getter
 @Setter
@@ -17,6 +19,8 @@ public class Image {
     private String fileName;
     private String fileType;
     private String downloadURL;
+    @Lob
+    private Blob image;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

@@ -1,14 +1,16 @@
 package org.example.springbootcartapi.services.image;
+
 import lombok.RequiredArgsConstructor;
 import org.example.springbootcartapi.dto.ImageDTO;
 import org.example.springbootcartapi.exceptions.ResourceNotFoundException;
 import org.example.springbootcartapi.model.Image;
 import org.example.springbootcartapi.model.Product;
 import org.example.springbootcartapi.repository.ImageRepository;
-import org.example.springbootcartapi.repository.ProductRepository;
 import org.example.springbootcartapi.services.product.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.sql.rowset.serial.SerialBlob;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,6 @@ import java.util.List;
 public class ImageService implements IImageService {
 
     private final ImageRepository imageRepository;
-    private final ProductRepository productRepository;
     private final ProductService productService;
 
     @Override
@@ -27,7 +28,10 @@ public class ImageService implements IImageService {
 
     @Override
     public void deleteImageById(Long id) {
-        imageRepository.deleteById(id);
+        imageRepository.findById(id).ifPresentOrElse(imageRepository::delete, () ->
+        {
+            throw new ResourceNotFoundException("No image found with id: " + id);
+        });
     }
 
     @Override
@@ -35,11 +39,12 @@ public class ImageService implements IImageService {
         String URL = "/api/v1/images/download";
         Product product = productService.getProductById(productId);
         List<ImageDTO> savedImageDTO = new ArrayList<>();
-        for(MultipartFile file : files) {
+        for (MultipartFile file : files) {
             try {
                 Image image = new Image();
                 image.setFileName(file.getOriginalFilename());
                 image.setFileType(file.getContentType());
+                image.setImage(new SerialBlob(file.getBytes()));
                 image.setProduct(product);
                 String downloadURL = URL + image.getId();
                 image.setDownloadURL(downloadURL);
@@ -57,7 +62,7 @@ public class ImageService implements IImageService {
                 imageDTO.setDownloadURL(savedImage.getDownloadURL());
                 savedImageDTO.add(imageDTO);
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -70,6 +75,7 @@ public class ImageService implements IImageService {
         try {
             image.setFileName(file.getOriginalFilename());
             image.setFileType(file.getContentType());
+            image.setImage(new SerialBlob(file.getBytes()));
             imageRepository.save(image);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

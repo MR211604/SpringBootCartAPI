@@ -1,5 +1,4 @@
 package org.example.springbootcartapi.controller;
-
 import lombok.RequiredArgsConstructor;
 import org.example.springbootcartapi.dto.ImageDTO;
 import org.example.springbootcartapi.exceptions.ResourceNotFoundException;
@@ -40,8 +39,8 @@ public class ImageController {
         }
     }
 
-    @GetMapping("/download/${imageId}")
-    public ResponseEntity<Resource> downloadImage(@RequestParam Long imageId) throws SQLException {
+    @GetMapping("/download/{imageId}")
+    public ResponseEntity<Resource> downloadImage(@PathVariable Long imageId) throws SQLException {
         Image image = imageService.getImageById(imageId);
         ByteArrayResource resource = new ByteArrayResource(image.getImage().getBytes(1, (int) image.getImage().length()));
         return ResponseEntity.ok().contentType(MediaType
@@ -50,8 +49,8 @@ public class ImageController {
                 .body(resource);
     }
 
-    @PutMapping("/update/${imageId}")
-    public ResponseEntity<APIResponse> updateImage(@RequestParam Long imageId, @RequestParam MultipartFile files) {
+    @PutMapping("/update/{imageId}")
+    public ResponseEntity<APIResponse> updateImage(@PathVariable Long imageId, @RequestBody MultipartFile files) {
         try {
             Image image = imageService.getImageById(imageId);
             if (image != null) {
@@ -59,14 +58,14 @@ public class ImageController {
                 return ResponseEntity.ok(new APIResponse("Successfully updated", imageId));
             }
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse("Image not found", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }
         return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new APIResponse("Image update failed!", null));
     }
 
 
-    @DeleteMapping("/delete/${imageId}")
-    public ResponseEntity<APIResponse> deleteImage(@RequestParam Long imageId) {
+    @DeleteMapping("/delete/{imageId}")
+    public ResponseEntity<APIResponse> deleteImage(@PathVariable Long imageId) {
         try {
             Image image = imageService.getImageById(imageId);
             if (image != null) {

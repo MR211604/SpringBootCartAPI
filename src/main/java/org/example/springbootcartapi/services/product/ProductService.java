@@ -21,7 +21,7 @@ public class ProductService implements IProductService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public Product addProdcut(AddProductRequest request) {
+    public Product addProduct(AddProductRequest request) {
         //Check if the category is found in the database
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName())).
                 orElseGet(() -> {

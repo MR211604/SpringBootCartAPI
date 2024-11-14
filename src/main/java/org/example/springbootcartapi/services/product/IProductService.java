@@ -6,7 +6,7 @@ import org.example.springbootcartapi.request.UpdateProductRequest;
 import java.util.List;
 
 public interface IProductService {
-    Product addProdcut(AddProductRequest product);
+    Product addProduct(AddProductRequest product);
     Product getProductById(Long id);
     void deleteProductById(Long id);
     Product updateProduct(UpdateProductRequest product, Long productId);
